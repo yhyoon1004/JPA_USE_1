@@ -2,14 +2,14 @@ package jpabook.jpashop.repository;
 
 import jpabook.jpashop.domain.Member;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceUnit;
 import java.util.List;
 
 @Repository
+@Transactional//클래스 레벨에 트렌젝셔널 어노테이션 사용시 클래스 안에 public 메서드은 다 적용됨
 public class MemberRepository {
     @PersistenceContext
     private EntityManager em;
@@ -23,10 +23,12 @@ public class MemberRepository {
         return member.getId();
     }
 
-    public Member find(Long id) {
+    public Member findOne(Long id) {
         return em.find(Member.class, id);
     }
 
+    //해당 readOnly옵션을 조회하는 곳에 줄 경우 성능을 최적화함 !! 읽기가 아닐 경우 넣으면 안됨, 조회가 많은 클래스면 클래스에 readOnly를 넣어 주고 그클래스 내부에 조회하는 메서드가 아닌 경우 따로 생 어노테이션(@Transactional)을 넣어주면 됨
+    @Transactional(readOnly=true)
     public List<Member> findAll() {
         List<Member> result = em.createQuery("select  m from Member m", Member.class).getResultList();
         return result;
