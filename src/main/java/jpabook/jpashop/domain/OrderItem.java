@@ -28,4 +28,29 @@ public class OrderItem {
     private int count;
 
 
+    protected OrderItem() {
+
+    }
+
+    public OrderItem(Item item, int orderPrice, int count) {
+        OrderItem orderItem = new OrderItem();
+        orderItem.setItem(item);
+        orderItem.setOrderPrice(orderPrice);
+        orderItem.setCount(count);
+
+    }
+
+
+    //비지니스 로직
+    /**
+     * 주문취소
+     * */
+    public void cancel() {
+        getItem().addStock(count );
+    }
+
+
+    public int getTotalPrice() {
+        return getOrderPrice() * getCount();
+    }
 }
