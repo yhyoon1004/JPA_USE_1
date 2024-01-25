@@ -1,7 +1,9 @@
 package jpabook.jpashop.domain;
 
 import jpabook.jpashop.domain.item.Item;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -10,6 +12,8 @@ import static javax.persistence.FetchType.LAZY;
 
 @Entity
 @Getter@Setter
+// vv lombok 이  protected 접근 제어자로 자동 생성자를 만들어   무분별한 객체생성 방지
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderItem {
 
     @Id
@@ -27,7 +31,9 @@ public class OrderItem {
     private int orderPrice;
     private int count;
 
-
+    //protected 접근 제어자로 다른 사람(개발자)의  무분별한 객체생성 방지
+//    protected OrderItem() {
+//    }
 
     public static OrderItem creatOrderItem(Item item, int orderPrice, int count) {
         OrderItem orderItem = new OrderItem();

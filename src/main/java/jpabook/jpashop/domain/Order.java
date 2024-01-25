@@ -1,6 +1,8 @@
 package jpabook.jpashop.domain;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.aspectj.weaver.ast.Or;
 
@@ -14,8 +16,8 @@ import static javax.persistence.FetchType.LAZY;
 
 @Entity
 @Table(name = "orders")
-@Getter
-@Setter
+@Getter@Setter
+@NoArgsConstructor(access =  AccessLevel.PROTECTED)
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -71,7 +73,7 @@ public class Order {
     }
 
     //매개변수 타입 뒤 ... 이 붙을 경우, 메서드 사용시 매개변수 뒤에 해당 타입의 값을 추가하여 계속 넣어줄 수있음
-    public Order createOrder(Member member, Delivery delivery, OrderItem... orderItems) {
+    public static Order createOrder(Member member, Delivery delivery, OrderItem... orderItems) {
         Order order = new Order();
         for (OrderItem item : orderItems) {
             order.addOrderItem(item);
