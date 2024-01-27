@@ -75,6 +75,8 @@ public class Order {
     //매개변수 타입 뒤 ... 이 붙을 경우, 메서드 사용시 매개변수 뒤에 해당 타입의 값을 추가하여 계속 넣어줄 수있음
     public static Order createOrder(Member member, Delivery delivery, OrderItem... orderItems) {
         Order order = new Order();
+        order.setMember(member);
+        order.setDelivery(delivery );
         for (OrderItem item : orderItems) {
             order.addOrderItem(item);
         }
@@ -91,8 +93,9 @@ public class Order {
         if (delivery.getStatus() == DeliveryStatus.COMP) {
             throw new IllegalStateException("이미 배송 완료된 상품입니다. 배송완료 상품은 취소가 불가능합니다. ");
         }
+        this.setStatus(OrderStatus.CANCEL);
         for (OrderItem item : orderItems) {
-            item. cancel();
+            item.cancel();
         }
     }
 
