@@ -12,7 +12,7 @@ public class HomeController {
 
 //    Logger logger = LoggerFactory.getLogger(getClass()) 기본 slf4j logger 생성법
 
-    @RequestMapping("/home")
+    @RequestMapping("/")
     public String home() {
         log.info("home controller");
         return "home";
