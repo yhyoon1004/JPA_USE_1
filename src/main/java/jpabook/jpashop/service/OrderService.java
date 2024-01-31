@@ -21,7 +21,7 @@ public class OrderService {
     private final ItemRepository itemRepository;
 
 
-    @Transactional
+    @Transactional//서비스단의 트렌젝셔널이 있는 상태, 영속성 컨텍스트가 있는 상태에서 처리해야 변경에 대해 추적할 수 있기에
     public Long order(Long memberId, Long itemId, int count) {
         //엔티티 조회
         Member member = memberRepository.findOne(memberId);
