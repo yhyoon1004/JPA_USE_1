@@ -9,12 +9,41 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController// @Controller + @ResponseBody
 @RequiredArgsConstructor
 public class MemberAPIController {
 
     private final MemberService memberService;
+
+    @GetMapping("/api/v1/members")
+    public List<Member> membersV1() {
+        return memberService.findMembers();
+    }
+
+    @GetMapping("/api/v2/members")
+    public Result membersV2() {
+        List<Member> findMembers = memberService.findMembers();
+        List<MemberDTO> collect = findMembers.stream()
+                .map((m) -> new MemberDTO(m.getName()))
+                .collect(Collectors.toList());
+        return new Result(collect.size(), collect);
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class Result<T> {    //이런식으로 데이터를 한번 감싸서 배열타입으로 반환해주면 나중에 유지보수에 좋음
+        private int count;
+        private T data;
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class MemberDTO {
+        private String name;
+    }
 
 
     @PostMapping("/api/v1/members")
