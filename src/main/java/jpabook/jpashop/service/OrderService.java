@@ -35,7 +35,7 @@ public class OrderService {
         delivery.setAddress(member.getAddress());//실제는 이렇게 하지않지만 간단한 예제를 위해
 
         //주문상품 생성
-        OrderItem orderItem = OrderItem.creatOrderItem(item, item.getPrice(), count);
+        OrderItem orderItem = OrderItem.createOrderItem(item, item.getPrice(), count);
 
         //주문 생성
         Order order = Order.createOrder(member, delivery, orderItem);
