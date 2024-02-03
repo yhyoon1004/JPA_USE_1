@@ -24,15 +24,21 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
-//	리빌드 없이 리컴파일로 변경된 리소스 반영하는 라이브러린
+//	리빌드 없이 리컴파일로 변경된 리소스 반영하는 라이브러리
 	implementation 'org.springframework.boot:spring-boot-devtools'
 
 	implementation 'mysql:mysql-connector-java:8.0.33'
+
+// https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-hibernate5
+	implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-hibernate5', version: '2.16.1'
+
 
 	compileOnly 'org.projectlombok:lombok'
 //	runtimeOnly 'com.h2database:h2'
 
 	annotationProcessor 'org.projectlombok:lombok'
+
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	//JUnit4 추가
 	testImplementation("org.junit.vintage:junit-vintage-engine") {
