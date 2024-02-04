@@ -1,16 +1,22 @@
 package jpabook.jpashop.api;
 
+import jpabook.jpashop.domain.Address;
 import jpabook.jpashop.domain.Order;
 import jpabook.jpashop.domain.OrderItem;
+import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
+import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,9 +31,55 @@ public class OrderAPIController {
             order.getMember().getName();    // hibernate5module 객체가 값이 비어있는 프록시 객체의 값은 반환 시키지 않기 때문에
             order.getDelivery().getAddress();
             List<OrderItem> orderItems = order.getOrderItems();
-            orderItems.stream().forEach(o-> o.getItem().getName());
-
+            orderItems.stream().forEach(o -> o.getItem().getName());
         }
         return all;
     }
+
+    @GetMapping("/api/v2/orders")
+    public List<OrderDTO> orderV2() {
+        List<Order> orders = orderRepository.findAllByString(new OrderSearch());
+        List<OrderDTO> collect = orders.stream()
+                .map(o -> new OrderDTO(o))
+                .collect(Collectors.toList());
+        return collect;
+    }
+
+    @Data
+    static class OrderDTO {
+
+        private Long orderId;
+        private String name;
+        private LocalDateTime orderDate;
+        private OrderStatus orderStatus;
+        private Address address;
+        private List<OrderItemDTO> orderItems;  //엔티티 객체를 외부에 노출시키지 않기 위해 (왜? > api 스펙이 엔티티에 맞춰져있어 나중에 유지보수 문제가 생김)
+        public OrderDTO(Order order) {
+            orderId = order.getId();
+            name = order.getMember().getName();
+            orderDate = order.getOrderDate();
+            orderStatus = order.getStatus();
+            address = order.getDelivery().getAddress();
+//            order.getOrderItems().stream().forEach(o -> o.getItem().getName()); //프록시 초기화
+//            orderItems = order.getOrderItems();
+            orderItems = order.getOrderItems().stream()
+                    .map(item -> new OrderItemDTO(item))
+                    .collect(Collectors.toList());
+        }
+
+    }
+
+    @Getter
+    static class OrderItemDTO{      //엔티티를 외부에 노출하는 것을 방지하고 api 스펙 변동에 유연하게 대처가능하게 모든 엔티티 요소를 DTO로 변환
+
+        private String itemName;// 상품 명
+        private int orderPrice;// 주문 가격
+        private int count;  //주문 수량
+        public OrderItemDTO(OrderItem item) {
+            itemName = item.getItem().getName();
+            orderPrice = item.getOrderPrice();
+            count = item.getCount();
+        }
+    }
+
 }
