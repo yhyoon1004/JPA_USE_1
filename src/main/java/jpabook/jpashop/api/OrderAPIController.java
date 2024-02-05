@@ -9,8 +9,6 @@ import jpabook.jpashop.repository.OrderSearch;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,6 +43,16 @@ public class OrderAPIController {
         return collect;
     }
 
+    @GetMapping("/api/v3/orders")
+    public List<OrderDTO> ordersV3() {
+        List<Order> orders =orderRepository.findAllWithItem();
+        List<OrderDTO> collect = orders.stream()
+                .map(o -> new OrderDTO(o))
+                .collect(Collectors.toList());
+        return collect;
+    }
+
+
     @Data
     static class OrderDTO {
 
@@ -54,6 +62,7 @@ public class OrderAPIController {
         private OrderStatus orderStatus;
         private Address address;
         private List<OrderItemDTO> orderItems;  //엔티티 객체를 외부에 노출시키지 않기 위해 (왜? > api 스펙이 엔티티에 맞춰져있어 나중에 유지보수 문제가 생김)
+
         public OrderDTO(Order order) {
             orderId = order.getId();
             name = order.getMember().getName();

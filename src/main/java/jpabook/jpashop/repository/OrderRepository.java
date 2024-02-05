@@ -82,4 +82,14 @@ public class OrderRepository {
         ).getResultList();
 
     }
+
+    public List<Order> findAllWithItem() {
+        return em.createQuery(
+                "select distinct o from Order o " +      //여기서 distinct 는  db sql 의 distinct 와(실제로 함) 엔티티의 id값이 같을 경우 중복을 제거함
+                "join fetch o.member m " +
+                "join fetch o.delivery d " +
+                "join fetch o.orderItems oi " +
+                "join fetch oi.item i", Order.class)
+                .getResultList();
+    }
 }
