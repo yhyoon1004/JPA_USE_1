@@ -10,9 +10,11 @@ spring:
       ddl-auto: create
     properties:
       hibernate:
-        show_sql: true
+#        show_sql: true
         format_sql: true
-
+        default_batch_fetch_size: 1000
+#       where column in(? ? ?) query의 갯수, xToMany 관계에서 Many의 테이블에서 조회할 외래키(즉, x) 값의 갯수를 설정하는 옵션
+#       maxsms 1000개 기준 -> 오류나는 DB가 있음
 logging.level:
   org.hibernate.SQL: debug
   org.hibernate.type: trace
