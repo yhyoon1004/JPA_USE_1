@@ -6,6 +6,8 @@ import jpabook.jpashop.domain.OrderItem;
 import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
+import jpabook.jpashop.repository.order.query.OrderFlatDTO;
+import jpabook.jpashop.repository.order.query.OrderItemQueryDTO;
 import jpabook.jpashop.repository.order.query.OrderQueryDTO;
 import jpabook.jpashop.repository.order.query.OrderQueryRepository;
 import lombok.Data;
@@ -18,6 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
 
 @RestController
 @RequiredArgsConstructor
@@ -49,7 +54,7 @@ public class OrderAPIController {
 
     @GetMapping("/api/v3/orders")
     public List<OrderDTO> ordersV3() {
-        List<Order> orders =orderRepository.findAllWithItem();
+        List<Order> orders = orderRepository.findAllWithItem();
         List<OrderDTO> collect = orders.stream()
                 .map(o -> new OrderDTO(o))
                 .collect(Collectors.toList());
@@ -57,12 +62,12 @@ public class OrderAPIController {
     }
 
     @GetMapping("/api/v3.1/orders")
-    public List<OrderDTO> ordersV3_page(@RequestParam(value = "offset",defaultValue = "0") int offset,
-                                        @RequestParam(value = "limit",defaultValue = "100") int limit
-                                        ) {
+    public List<OrderDTO> ordersV3_page(@RequestParam(value = "offset", defaultValue = "0") int offset,
+                                        @RequestParam(value = "limit", defaultValue = "100") int limit
+    ) {
         List<Order> orders = orderRepository.findAllWithMemberDelivery(offset, limit);
         List<OrderDTO> collect = orders.stream()
-                .map(o-> new OrderDTO(o))
+                .map(o -> new OrderDTO(o))
                 .collect(Collectors.toList());
         return collect;
     }
@@ -75,6 +80,20 @@ public class OrderAPIController {
     @GetMapping("/api/v5/orders")
     public List<OrderQueryDTO> ordersV5() {
         return orderQueryRepository.findAllByDTO_optimization();
+    }
+
+    @GetMapping("/api/v6/orders")
+    public List<OrderQueryDTO> ordersV6() {
+        List<OrderFlatDTO> flats = orderQueryRepository.findAllByDTO_flat();
+
+        return flats.stream()
+                .collect(
+                        groupingBy(o -> new OrderQueryDTO(o.getOrderId(), o.getName(), o.getOrderDate(), o.getOrderStatus(), o.getAddress()),
+                        mapping(o -> new OrderItemQueryDTO(o.getOrderId(), o.getItemName(), o.getOrderPrice(), o.getCount()), toList())
+                ))
+                .entrySet().stream()
+                .map(e -> new OrderQueryDTO(e.getKey().getOrderId(), e.getKey().getName(), e.getKey().getOrderDate(), e.getKey().getOrderStatus(), e.getKey().getAddress(), e.getValue()))
+                .collect(toList());
     }
 
 
@@ -104,11 +123,12 @@ public class OrderAPIController {
     }
 
     @Getter
-    static class OrderItemDTO{      //엔티티를 외부에 노출하는 것을 방지하고 api 스펙 변동에 유연하게 대처가능하게 모든 엔티티 요소를 DTO로 변환
+    static class OrderItemDTO {      //엔티티를 외부에 노출하는 것을 방지하고 api 스펙 변동에 유연하게 대처가능하게 모든 엔티티 요소를 DTO로 변환
 
         private String itemName;// 상품 명
         private int orderPrice;// 주문 가격
         private int count;  //주문 수량
+
         public OrderItemDTO(OrderItem item) {
             itemName = item.getItem().getName();
             orderPrice = item.getOrderPrice();
